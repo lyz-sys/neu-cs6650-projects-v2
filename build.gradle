@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'application'
+    id "io.freefair.lombok" version "6.2.0" 
+    id 'org.springframework.boot' version '3.2.2'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+group = 'com.lyz'
+version = '0.0.1'
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+        }
+        resources {
+            srcDirs 'src/main/resources'
+        }
+    }
+
+    test {
+        java {
+            srcDirs 'src/test/java'
+        }
+        resources {
+            srcDirs 'src/test/resources'
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral() 
+}
+
+dependencies {
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'io.swagger:swagger-java-client:1.0.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+}
+
+war {
+    webAppDirName = 'src/main/java/project1/webapp'
+}
+
+application {
+    // mainClassName = 'project1.part1.ThroughputEstimationDriver'
+    // mainClassName = 'project1.part1.Driver'
+    // mainClassName = 'project1.part2.Driver'
+    // mainClassName = 'project1.sbwebapp.Application'
+    mainClassName = 'project1.LoggingDriver'
+}
+
+bootJar {
+    archiveBaseName = 'sbwebapp'
+    version = '0.0.1'
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // or choose another strategy
+}
