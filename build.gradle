@@ -55,10 +55,10 @@ war {
 
 application {
     // mainClassName = 'project1.part1.ThroughputEstimationDriver'
-    // mainClassName = 'project1.part1.Driver'
+    mainClassName = 'project1.part1.Driver'
     // mainClassName = 'project1.part2.Driver'
     // mainClassName = 'project1.sbwebapp.Application'
-    mainClassName = 'project1.LoggingDriver'
+    // mainClassName = 'project1.LoggingDriver'
 }
 
 bootJar {

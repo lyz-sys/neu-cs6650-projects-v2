@@ -10,4 +10,4 @@ lyz-cs6650-key.pem
 
 java-client-generated/
 
-logs/
+logs/myapp.log

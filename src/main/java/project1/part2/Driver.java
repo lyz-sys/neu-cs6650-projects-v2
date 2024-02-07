@@ -66,6 +66,8 @@ public class Driver {
             Thread.currentThread().interrupt(); // Preserve interrupt status
         }
         
+        long endTime = System.currentTimeMillis() - startTime;
+
         // Wait for all threads to finish and collect results
         for (SendPostRequestTask task : sendPostRequestTaskList) {
             try {
@@ -75,7 +77,7 @@ public class Driver {
             }
         }
 
-        Util.calculateStatistics(requestResultList, System.currentTimeMillis() - startTime);
+        Util.calculateStatistics(requestResultList, endTime);
         Util.writeToCsv(requestResultList);
     }
 }

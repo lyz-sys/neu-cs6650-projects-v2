@@ -65,6 +65,8 @@ public class Driver {
             Thread.currentThread().interrupt(); // Preserve interrupt status
         }
 
+        long endTime = System.currentTimeMillis() - startTime;
+
         // Wait for all threads to finish and collect results
         for (SendPostRequestTask sendPostRequestTask : sendPostRequestTaskList) {
             successfulCount += sendPostRequestTask.getSuccessfulCount();
@@ -75,6 +77,6 @@ public class Driver {
         logger.info("Unsuccessful requests: {}", unsuccessfulCount);
         logger.info("Total run time: {} sec", (System.currentTimeMillis() - startTime) / 1000);
         logger.info("Total throughput: {} requests/sec", successfulCount /
-                ((System.currentTimeMillis() - startTime) / 1000));
+                (endTime / 1000));
     }
 }
