@@ -1,4 +1,4 @@
-# git-repo-URL: https://github.com/lyz-sys/neu-cs6650-projects
+# git-repo-URL: https://github.com/lyz-sys/neu-cs6650-projects-v2
 
 # client description:
 ## part1
@@ -11,7 +11,7 @@ Main driver output window:
 ![](./part1.png)
 
 ## part2
-Part two's client side code is located in src/main/java/projct1/part2. It sends the task in its driver class. Each thread's task logic is encapuslated in its SendPostRequestTask class. This time, we the SendPostRequestTask is slightly different than the one in part1. Since we need to record each request into csv, and claculate additional statistics based on the record. We create RequestResult class for each record, and Util class to calculate statistics and print the results in terminal. Since this time we use Executor service in driver, the throughput is significantly increased.
+Part two's client side code is located in src/main/java/projct1/part2. It sends the task in its driver class. Each thread's task logic is encapuslated in its SendPostRequestTask class. This time, we the SendPostRequestTask is slightly different than the one in part1. Since we need to record each request into csv, and claculate additional statistics based on the record. We create RequestResult class for each record, and Util class to calculate statistics and print the results in terminal. As the server is instable when I run this time, the throuput is little bit higher.
 
 Main driver output window:
 ![](./part2.png)
