@@ -16,12 +16,14 @@ public class RabbitMQUtil {
 
     public static void sendMessage(String message) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("35.92.143.116"); // Set this to your RabbitMQ server address
-        // You can also set other connection properties here (e.g., username, password, port, virtual host)
+        factory.setHost("34.219.70.72");
+        factory.setUsername("admin");
+        factory.setPassword("admin_password");
+        factory.setPort(5672);
 
         try (Connection connection = factory.newConnection();
-             Channel channel = connection.createChannel()) {
-             
+                Channel channel = connection.createChannel()) {
+
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
             log.info(" [x] Sent '" + message + "'");

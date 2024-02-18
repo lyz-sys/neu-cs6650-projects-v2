@@ -78,12 +78,22 @@ public class SendPostRequestTask implements Runnable {
             ApiResponse<Void> response = api.writeNewLiftRideWithHttpInfo(
                     event.getBody(), event.getResortID(), event.getSeasonID(), event.getDayID(), event.getSkierID());
             long latency = System.currentTimeMillis() - startTime;
+            handleSuccessfulResponse(response);
             return new RequestResult(response.getStatusCode(), latency, startTime, true);
         } catch (ApiException e) {
             long latency = System.currentTimeMillis() - startTime;
             handleApiException(e);
             return new RequestResult(e.getCode(), latency, startTime, false);
         }
+    }
+
+    private static void handleSuccessfulResponse(ApiResponse<Void> response) {
+        // log.info("Response received: " + response.getStatusCode()); // todo: receive message from response
+        // if (response.getData() != null) {
+        //     log.info("Response received: " + response.getStatusCode() + " - Message: " + response.getData());
+        // } else {
+        //     log.info("Response received: " + response.getStatusCode() + " - No message in the response body.");
+        // }
     }
 
     private static void handleApiException(ApiException e) {

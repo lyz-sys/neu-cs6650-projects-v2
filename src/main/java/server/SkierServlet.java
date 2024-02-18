@@ -24,14 +24,14 @@ public class SkierServlet extends HttpServlet {
             try {
                 RabbitMQUtil.sendMessage(message);
                 resp.getWriter().write("Message sent to RabbitMQ: " + message);
-            } catch (Exception e) {
+            }catch (Exception e) {
                 e.printStackTrace();
-                resp.getWriter().write("Failed to send message to RabbitMQ.");
+                resp.getWriter().write("Failed to send message to RabbitMQ: " + e.getMessage());
             }
 
             // Set response content type and write response body if needed
             resp.setContentType("application/json");
-            // resp.getWriter().write("New lift ride created");
+            resp.getWriter().write("New lift ride created");
             resp.setStatus(HttpServletResponse.SC_CREATED); // 201 status code for created resource
         } else {
             // URL does not match the expected pattern
