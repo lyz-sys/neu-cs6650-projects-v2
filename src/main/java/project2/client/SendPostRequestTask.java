@@ -88,12 +88,7 @@ public class SendPostRequestTask implements Runnable {
     }
 
     private static void handleSuccessfulResponse(ApiResponse<Void> response) {
-        // log.info("Response received: " + response.getStatusCode()); // todo: receive message from response
-        // if (response.getData() != null) {
-        //     log.info("Response received: " + response.getStatusCode() + " - Message: " + response.getData());
-        // } else {
-        //     log.info("Response received: " + response.getStatusCode() + " - No message in the response body.");
-        // }
+        log.info("Response received: " + response.getStatusCode());
     }
 
     private static void handleApiException(ApiException e) {

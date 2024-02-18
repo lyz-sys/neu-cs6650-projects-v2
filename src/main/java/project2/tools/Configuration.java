@@ -10,9 +10,15 @@ import lombok.Data;
 public class Configuration {
     private String basePath;
     private int connectionTimeout;
+
     private int maxEvents;
     private int threadNum;
     private int requestNumPerThread;
+
+    private String rmqHostAddress;
+    private String rmqUsername;
+    private String rmqPassword;
+    private String rmqMainQueueName;
 
     public Configuration() {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
@@ -58,5 +64,10 @@ public class Configuration {
         } catch (NumberFormatException e) {
             log.error("Error parsing requestNumPerThread from string: " + e.getMessage());
         }
+
+        rmqHostAddress = prop.getProperty("rmq.host.address");
+        rmqUsername = prop.getProperty("rmq.username");
+        rmqPassword = prop.getProperty("rmq.password");
+        rmqMainQueueName = prop.getProperty("rmq.main.queue.name");
     }
 }

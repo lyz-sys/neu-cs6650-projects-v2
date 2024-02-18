@@ -1,4 +1,4 @@
-package server;
+package project2.server;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -23,10 +23,10 @@ public class SkierServlet extends HttpServlet {
             String message = "Hello RabbitMQ!";
             try {
                 RabbitMQUtil.sendMessage(message);
-                resp.getWriter().write("Message sent to RabbitMQ: " + message);
+                resp.getWriter().write("Message sent to RabbitMQ: " + message + "\n");
             }catch (Exception e) {
                 e.printStackTrace();
-                resp.getWriter().write("Failed to send message to RabbitMQ: " + e.getMessage());
+                resp.getWriter().write("Failed to send message to RabbitMQ: " + e.getMessage() + "\n");
             }
 
             // Set response content type and write response body if needed
