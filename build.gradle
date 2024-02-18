@@ -10,8 +10,8 @@ plugins {
 sourceCompatibility = '17'
 targetCompatibility = '17'
 
-group = 'com.lyz'
-version = '0.0.1'
+// group = 'com.lyz'
+// version = '0.0.1'
 
 sourceSets {
     main {
@@ -47,18 +47,21 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.rabbitmq:amqp-client:5.13.1'
 }
 
 war {
-    webAppDirName = 'src/main/java/project1/webapp'
+    webAppDirName = 'src/main/webapp'
 }
 
 application {
     // mainClassName = 'project1.part1.ThroughputEstimationDriver'
-    mainClassName = 'project1.part1.Driver'
+    // mainClassName = 'project1.part1.Driver'
     // mainClassName = 'project1.part2.Driver'
     // mainClassName = 'project1.sbwebapp.Application'
     // mainClassName = 'project1.LoggingDriver'
+
+    mainClassName = 'project2.client.Driver'
 }
 
 bootJar {

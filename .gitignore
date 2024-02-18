@@ -8,6 +8,6 @@ lyz-cs6650-key.pem
 
 .DS_Store
 
-java-client-generated/
+misc/java-client-generated/
 
 logs/myapp.log
