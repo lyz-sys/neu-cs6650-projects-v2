@@ -22,11 +22,10 @@ public class RabbitMQUtil {
         factory.setHost(CONFIG.getRmqHostAddress());
         factory.setUsername(CONFIG.getRmqUsername());
         factory.setPassword(CONFIG.getRmqPassword());
-
-        Connection connection = factory.newConnection();
-        Channel channel = connection.createChannel();
-
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-        channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
+        try (Connection connection = factory.newConnection();
+                Channel channel = connection.createChannel()) {
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null); // tip: the cnannel parameters must be same for both producer and consumer
+            channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
+        }
     }
 }

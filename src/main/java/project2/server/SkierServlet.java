@@ -15,12 +15,12 @@ public class SkierServlet extends HttpServlet {
 
         // Check if the URL pattern is correct
         if (isPostURLValid(pathParts)) {
-            String resortID = pathParts[1]; // todo: later turn into correct type
+            String resortID = pathParts[1];
             String seasonID = pathParts[3];
             String dayID = pathParts[5];
             String skierID = pathParts[7];
 
-            String message = "Hello RabbitMQ!";
+            String message = String.join(";", resortID, seasonID, dayID, skierID); // todo: setup another thread to send message to RabbitMQ
             try {
                 RabbitMQUtil.sendMessage(message);
                 resp.getWriter().write("Message sent to RabbitMQ: " + message + "\n");

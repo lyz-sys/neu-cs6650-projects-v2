@@ -5,13 +5,14 @@ plugins {
     id "io.freefair.lombok" version "6.2.0" 
     id 'org.springframework.boot' version '3.2.2'
 	id 'io.spring.dependency-management' version '1.1.4'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 sourceCompatibility = '17'
 targetCompatibility = '17'
 
 // group = 'com.lyz'
-// version = '0.0.1'
+// version = '0.0.2'
 
 sourceSets {
     main {
@@ -62,6 +63,20 @@ application {
     // mainClassName = 'project1.LoggingDriver'
 
     mainClassName = 'project2.client.Driver'
+    // mainClassName = 'project2.serverbackendconsumer.Driver'
+}
+
+task runServerBackendConsumer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'project2.serverbackendconsumer.Driver'
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'project2.serverbackendconsumer.Driver' 
+        )
+    }
 }
 
 bootJar {
