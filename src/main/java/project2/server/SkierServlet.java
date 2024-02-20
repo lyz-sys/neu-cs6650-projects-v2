@@ -5,29 +5,42 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import java.io.PrintWriter;
+import java.io.BufferedReader;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import lombok.extern.slf4j.Slf4j;
+
+import project2.tools.*;
+
+@Slf4j
 @WebServlet(name = "SkierServlet", urlPatterns = "/skiers/*")
 public class SkierServlet extends HttpServlet {
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String pathInfo = req.getPathInfo();
-        String[] pathParts = pathInfo.split("/");
+    public void init() throws ServletException {
+        RabbitMQUtil.initRMQ();
+    }
 
-        // Check if the URL pattern is correct
-        if (isPostURLValid(pathParts)) {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Check if the request is valid
+        if (isRequestValid(req)) {
+            String pathInfo = req.getPathInfo();
+            String[] pathParts = pathInfo.split("/");
+
             String resortID = pathParts[1];
             String seasonID = pathParts[3];
             String dayID = pathParts[5];
             String skierID = pathParts[7];
 
-            String message = String.join(";", resortID, seasonID, dayID, skierID); // todo: setup another thread to send message to RabbitMQ
+            String message = String.join(";", resortID, seasonID, dayID, skierID);
             try {
                 RabbitMQUtil.sendMessage(message);
-                resp.getWriter().write("Message sent to RabbitMQ: " + message + "\n");
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                resp.getWriter().write("Failed to send message to RabbitMQ: " + e.getMessage() + "\n");
-            }
+            } // todo: handle message asynchrously to increase throughput(ConfirmListener)
 
             // Set response content type and write response body if needed
             resp.setContentType("application/json");
@@ -40,22 +53,97 @@ public class SkierServlet extends HttpServlet {
     }
 
     // Check if the URL pattern is correct
-    private boolean isPostURLValid(String[] pathParts) {
-        try {
-            if (pathParts.length == 8 &&
-                    "seasons".equals(pathParts[2]) &&
-                    "days".equals(pathParts[4]) &&
-                    "skiers".equals(pathParts[6])) {
-                Integer.parseInt(pathParts[1]);
-                Integer.parseInt(pathParts[7]);
-                int dayID = Integer.parseInt(pathParts[5]);
-                if (dayID >= 1 && dayID <= 366) {
-                    return true;
-                }
-            }
+    private boolean isRequestValid(HttpServletRequest req) {
+        LiftRide ride = parseRequestBody(req);
+        if (ride == null) {
+            log.error("Invalid request body");
             return false;
+        }
+        if (!isLiftIDValid(ride.getLiftID()) || !isTimeValid(ride.getTime())) {
+            return false;
+        }
+        if (!isURLPatternValid(req.getPathInfo())) {
+            return false;
+        }
+        return true;
+    }
+
+    private LiftRide parseRequestBody(HttpServletRequest req) {
+        LiftRide ride = null;
+        try {
+            StringBuilder sb = new StringBuilder();
+            String line;
+            try (BufferedReader reader = req.getReader()) {
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            } catch (IOException e) {
+                log.error("Failed to read request body", e);
+            }
+            String requestBody = sb.toString();
+            if (!requestBody.isEmpty()) {
+                Gson gson = new Gson();
+                ride = gson.fromJson(requestBody, LiftRide.class);
+            }
+        } catch (JsonSyntaxException e) {
+            log.error("Invalid request body", e);
+        }
+        return ride;
+    }
+
+    private boolean isLiftIDValid(int liftID) {
+        return liftID >= 1 && liftID <= 40;
+    }
+
+    private boolean isTimeValid(int time) {
+        return time >= 1 && time <= 360;
+    }
+
+    private boolean isURLPatternValid(String pathInfo) {
+        String[] pathParts = pathInfo.split("/");
+        try {
+            if (pathParts.length != 8 ||
+                    (!"seasons".equals(pathParts[2])) ||
+                    (!"days".equals(pathParts[4])) ||
+                    (!"skiers".equals(pathParts[6]))) {
+                return false;
+            }
+
+            int resortID = Integer.parseInt(pathParts[1]);
+            if (resortID < 1 || resortID > 10) {
+                return false;
+            }
+
+            int skierID = Integer.parseInt(pathParts[7]);
+            if (skierID < 1 || skierID > 100000) {
+                return false;
+            }
+
+            int dayID = Integer.parseInt(pathParts[5]);
+            if (dayID < 1 || dayID > 366) {
+                return false;
+            }
         } catch (NumberFormatException e) {
             return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void destroy() {
+        RabbitMQUtil.destroyRMQ();
+    }
+
+    static class LiftRide {
+        private int time;
+        private int liftID;
+
+        public int getTime() {
+            return time;
+        }
+
+        public int getLiftID() {
+            return liftID;
         }
     }
 }

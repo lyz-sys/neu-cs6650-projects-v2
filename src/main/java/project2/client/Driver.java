@@ -28,10 +28,9 @@ public class Driver {
     private static final List<RequestResult> REQUEST_RESULT_LIST = new ArrayList<>();
 
     public static void main(String[] args) {
-        // Generate 200,000 events
         for (int i = 0; i < MAX_EVENTS; i++) {
             SkierLiftRideEvent event = new SkierLiftRideEvent();
-            EVENT_QUEUE.offer(event); // Non-blocking operation
+            EVENT_QUEUE.offer(event);
         }
 
         long startTime = System.currentTimeMillis();

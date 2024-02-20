@@ -62,13 +62,18 @@ application {
     // mainClassName = 'project1.sbwebapp.Application'
     // mainClassName = 'project1.LoggingDriver'
 
-    mainClassName = 'project2.client.Driver'
-    // mainClassName = 'project2.serverbackendconsumer.Driver'
+    // mainClassName = 'project2.client.Driver'
+    mainClassName = 'project2.serverbackendconsumer.Driver' // why mainclass name is used by the jar task?
 }
 
 task runServerBackendConsumer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'project2.serverbackendconsumer.Driver'
+}
+
+task runClient(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'project2.client.Driver'
 }
 
 jar {
