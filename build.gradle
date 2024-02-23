@@ -56,14 +56,7 @@ war {
 }
 
 application {
-    // mainClassName = 'project1.part1.ThroughputEstimationDriver'
-    // mainClassName = 'project1.part1.Driver'
-    // mainClassName = 'project1.part2.Driver'
-    // mainClassName = 'project1.sbwebapp.Application'
-    // mainClassName = 'project1.LoggingDriver'
-
-    // mainClassName = 'project2.client.Driver'
-    mainClassName = 'project2.serverbackendconsumer.Driver' // why mainclass name is used by the jar task?
+    mainClassName = 'project2.serverbackendconsumer.Driver'
 }
 
 task runServerBackendConsumer(type: JavaExec) {
@@ -74,14 +67,6 @@ task runServerBackendConsumer(type: JavaExec) {
 task runClient(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'project2.client.Driver'
-}
-
-jar {
-    manifest {
-        attributes(
-            'Main-Class': 'project2.serverbackendconsumer.Driver' 
-        )
-    }
 }
 
 bootJar {

@@ -14,7 +14,7 @@ import project2.tools.Configuration;
 
 @Slf4j
 public class Driver {
-    private static final Configuration CONFIG = new Configuration();
+    private static final Configuration CONFIG = new Configuration(); // todo: replace rmq related code in rmqutil class
     private static final String QUEUE_NAME = CONFIG.getRmqMainQueueName();
     private static final ConcurrentHashMap<String, List<String>> liftRidesMap = new ConcurrentHashMap<>();
 

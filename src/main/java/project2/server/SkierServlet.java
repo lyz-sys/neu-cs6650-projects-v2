@@ -40,7 +40,7 @@ public class SkierServlet extends HttpServlet {
                 RabbitMQUtil.sendMessage(message);
             } catch (Exception e) {
                 e.printStackTrace();
-            } // todo: handle message asynchrously to increase throughput(ConfirmListener)
+            } // todo: maybe handle message asynchrously to increase throughput(ConfirmListener)
 
             // Set response content type and write response body if needed
             resp.setContentType("application/json");
