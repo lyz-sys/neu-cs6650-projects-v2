@@ -13,7 +13,7 @@ import project2.tools.Configuration;
 
 @Slf4j
 public class RabbitMQUtil {
-    private static final Configuration CONFIG = new Configuration(); // todo: maybe a singleton pattern
+    private static final Configuration CONFIG = new Configuration();
     private static Connection connection;
     private static ChannelPool channelPool;
     private static final String QUEUE_NAME = CONFIG.getRmqMainQueueName();

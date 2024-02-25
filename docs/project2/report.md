@@ -11,5 +11,7 @@ metrics without load-balencer
 ![](no-lb.png)
 
 rmq console profile
-![](rmq-profile.png)
+![](rmq-1.png)
+
+![](rmq-2.png)
 

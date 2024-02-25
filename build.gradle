@@ -59,7 +59,15 @@ application {
     mainClassName = 'project2.serverbackendconsumer.Driver'
 }
 
-task runServerBackendConsumer(type: JavaExec) {
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'project2.serverbackendconsumer.Driver'
+        )
+    }
+}
+
+task runConsumer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'project2.serverbackendconsumer.Driver'
 }

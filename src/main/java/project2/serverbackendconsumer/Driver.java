@@ -14,7 +14,7 @@ import project2.tools.Configuration;
 
 @Slf4j
 public class Driver {
-    private static final Configuration CONFIG = new Configuration(); // todo: replace rmq related code in rmqutil class
+    private static final Configuration CONFIG = new Configuration(); // todo: try rmq util?
     private static final String QUEUE_NAME = CONFIG.getRmqMainQueueName();
     private static final ConcurrentHashMap<String, List<String>> liftRidesMap = new ConcurrentHashMap<>();
 
@@ -23,8 +23,7 @@ public class Driver {
         factory.setHost(CONFIG.getRmqHostAddress());
         factory.setUsername(CONFIG.getRmqUsername());
         factory.setPassword(CONFIG.getRmqPassword());
-
-        for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
+        for (int i = 0; i < CONFIG.getConsumerThreadNum(); i++) {
             new Thread(() -> {
                 try {
                     final Connection connection = factory.newConnection();

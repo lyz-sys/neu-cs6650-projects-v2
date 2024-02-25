@@ -20,6 +20,8 @@ public class Configuration {
     private String rmqPassword;
     private String rmqMainQueueName;
 
+    private int consumerThreadNum;
+
     public Configuration() {
         try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {
@@ -69,5 +71,12 @@ public class Configuration {
         rmqUsername = prop.getProperty("rmq.username");
         rmqPassword = prop.getProperty("rmq.password");
         rmqMainQueueName = prop.getProperty("rmq.main.queue.name");
+
+        String consumerThreadNumStr = prop.getProperty("server.consumer.thread.num");
+        try {
+            consumerThreadNum = Integer.parseInt(consumerThreadNumStr);
+        } catch (NumberFormatException e) {
+            log.error("Error parsing consumerThreadNum from string: " + e.getMessage());
+        }
     }
 }
