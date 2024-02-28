@@ -85,11 +85,4 @@ public class RabbitMQUtil {
             }
         }
     }
-
-    public static void consumeMessage(DeliverCallback deliverCallback) throws Exception {
-        final Channel channel = connection.createChannel();
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null); // tip: the cnannel parameters must be
-                                                                     // same for both producer and consumer
-        channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {});
-    }
 }
