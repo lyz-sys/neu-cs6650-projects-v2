@@ -40,7 +40,7 @@ public class SkierServlet extends HttpServlet {
                 RabbitMQUtil.sendMessage(message);
             } catch (Exception e) {
                 e.printStackTrace();
-            } // todo: maybe handle message asynchrously to increase throughput(ConfirmListener)
+            } // todo: maybe do it asynchronously
 
             // Set response content type and write response body if needed
             resp.setContentType("application/json");
@@ -59,28 +59,13 @@ public class SkierServlet extends HttpServlet {
             log.error("Invalid request body");
             return false;
         }
-        if (!isLiftIDValid(ride.getLiftID()) || !isTimeValid(ride.getTime())) {
-            return false;
-        }
-        if (!isURLPatternValid(req.getPathInfo())) {
-            return false;
-        }
-        return true;
+        return isLiftIDValid(ride.getLiftID()) && isTimeValid(ride.getTime()) && isURLPatternValid(req.getPathInfo());
     }
 
     private LiftRide parseRequestBody(HttpServletRequest req) {
         LiftRide ride = null;
         try {
-            StringBuilder sb = new StringBuilder();
-            String line;
-            try (BufferedReader reader = req.getReader()) {
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-            } catch (IOException e) {
-                log.error("Failed to read request body", e);
-            }
-            String requestBody = sb.toString();
+            String requestBody = getRequestBody(req);
             if (!requestBody.isEmpty()) {
                 Gson gson = new Gson();
                 ride = gson.fromJson(requestBody, LiftRide.class);
@@ -89,6 +74,19 @@ public class SkierServlet extends HttpServlet {
             log.error("Invalid request body", e);
         }
         return ride;
+    }
+
+    private String getRequestBody(HttpServletRequest req) {
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try (BufferedReader reader = req.getReader()) {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (IOException e) {
+            log.error("Failed to read request body", e);
+        }
+        return sb.toString();
     }
 
     private boolean isLiftIDValid(int liftID) {

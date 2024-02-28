@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeoutException;
+import project2.tools.Configuration;
 
 public class ChannelPool {
-    private static final int POOL_SIZE = 100;
+    private static final Configuration CONFIG = new Configuration();
+    private static final int POOL_SIZE = CONFIG.getRmqChannelPoolSize();
     private final BlockingQueue<Channel> pool = new LinkedBlockingQueue<>(POOL_SIZE);
     private final Connection connection;
 

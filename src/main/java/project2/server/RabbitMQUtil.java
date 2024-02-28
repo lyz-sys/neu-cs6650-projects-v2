@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+import com.rabbitmq.client.*;
 
 import project2.tools.Configuration;
 
@@ -51,10 +52,30 @@ public class RabbitMQUtil {
         Channel channel = null;
         try {
             channel = channelPool.borrowChannel(); // Borrow a channel from the pool
-            
-            channel.queueDeclare(QUEUE_NAME, false, false, false, null); // tip: the cnannel parameters must be same for both producer and consumer
+
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null); // tip: the cnannel parameters must be same for
+                                                                         // both producer and consumer
             channel.basicPublish("", QUEUE_NAME, null, message.getBytes(StandardCharsets.UTF_8));
-            
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ServletException("Failed to borrow a channel from the pool", e);
+        } finally {
+            if (channel != null) {
+                channelPool.returnChannel(channel); // Return the channel to the pool
+            }
+        }
+    }
+
+    public static void consumeMessage(DeliverCallback deliverCallback) throws Exception {
+        Channel channel = null;
+        try {
+            channel = channelPool.borrowChannel(); // Borrow a channel from the pool
+
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            channel.basicConsume(QUEUE_NAME, true, deliverCallback, consumerTag -> {
+            });
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new ServletException("Failed to borrow a channel from the pool", e);

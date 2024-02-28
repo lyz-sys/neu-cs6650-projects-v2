@@ -19,6 +19,7 @@ public class Configuration {
     private String rmqUsername;
     private String rmqPassword;
     private String rmqMainQueueName;
+    private int rmqChannelPoolSize;
 
     private int consumerThreadNum;
 
@@ -71,6 +72,13 @@ public class Configuration {
         rmqUsername = prop.getProperty("rmq.username");
         rmqPassword = prop.getProperty("rmq.password");
         rmqMainQueueName = prop.getProperty("rmq.main.queue.name");
+
+        String rmqChannelPoolSizeStr = prop.getProperty("rmq.channel.pool.size");
+        try {
+            rmqChannelPoolSize = Integer.parseInt(rmqChannelPoolSizeStr);
+        } catch (NumberFormatException e) {
+            log.error("Error parsing rmqChannelPoolSize from string: " + e.getMessage());
+        }
 
         String consumerThreadNumStr = prop.getProperty("server.consumer.thread.num");
         try {
