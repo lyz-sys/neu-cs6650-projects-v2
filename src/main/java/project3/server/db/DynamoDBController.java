@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.ConcurrentMap;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import java.util.Iterator;
 
 @Slf4j
 public class DynamoDBController {
@@ -18,11 +19,18 @@ public class DynamoDBController {
             .build();
 
     public void updateSkIdTable(ConcurrentMap<String, List<String>> liftRidesMap) {
-        int itemCount = 0; // todo: magic number here, may need to change
-        while (itemCount <= 200000) {
-            for (Map.Entry<String, List<String>> entry : liftRidesMap.entrySet()) {
+        int itemCount = 0;
+        while (!liftRidesMap.isEmpty() && itemCount < 200000) { // todo: may need to confirm the total items in the table
+            for (Iterator<Map.Entry<String, List<String>>> it = liftRidesMap.entrySet().iterator(); it.hasNext();) {
+                Map.Entry<String, List<String>> entry = it.next();
                 String skierId = entry.getKey();
                 List<String> rides = entry.getValue();
+
+                if (rides.size() < 5) {
+                    log.error("Invalid ride data for skierId: " + skierId);
+                    it.remove();
+                    continue;
+                }
 
                 String resortID = rides.get(0);
                 String seasonID = rides.get(1);
@@ -30,22 +38,31 @@ public class DynamoDBController {
                 String liftID = rides.get(3);
                 String time = rides.get(4);
 
-                PutItemRequest putItemRequest = PutItemRequest.builder()
-                    .tableName("skier-table")
-                    .item(Map.of(
-                        "PK", AttributeValue.builder().s(skierId).build(), // skierId
-                        "SK", AttributeValue.builder().s(String.join("#", resortID, seasonID, dayID, liftID, time)).build(), // Composite key
-                        "verticals", AttributeValue.builder().n(String.valueOf(10 * Integer.parseInt(liftID))).build() // Assuming liftId is a numeric value
-                        // Add other attributes as needed
-                    ))
-                    .build();
+                try {
+                    PutItemRequest putItemRequest = PutItemRequest.builder()
+                            .tableName("skier-table")
+                            .item(Map.of(
+                                    "skierId", AttributeValue.builder().s(skierId).build(),
+                                    "resortID", AttributeValue.builder().s(resortID).build(),
+                                    "seasonID", AttributeValue.builder().s(seasonID).build(),
+                                    "dayID", AttributeValue.builder().s(dayID).build(),
+                                    "liftID", AttributeValue.builder().s(liftID).build(),
+                                    "time", AttributeValue.builder().s(time).build(),
+                                    "verticals",
+                                    AttributeValue.builder().n(String.valueOf(10 * Integer.parseInt(liftID))).build()))
+                            .build();
 
-                dynamoDbClient.putItem(putItemRequest);
+                    dynamoDbClient.putItem(putItemRequest);
+                    itemCount++;
+                } catch (Exception e) {
+                    log.error("Error putting item to DynamoDB: " + e.getMessage(), e);
+                } finally {
+                    it.remove();
+                }
 
-                liftRidesMap.remove(skierId);
-                itemCount++;
                 log.info("item count: " + itemCount);
             }
         }
+        log.info("Finished updating skier-table. Total items processed: " + itemCount);
     }
 }
