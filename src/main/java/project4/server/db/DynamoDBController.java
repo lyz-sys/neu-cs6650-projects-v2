@@ -1,4 +1,4 @@
-package project3.server.db;
+package project4.server.db;
 
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -31,6 +31,28 @@ public class DynamoDBController {
             .credentialsProvider(StaticCredentialsProvider.create(awsSessionCredentials))
             .region(Region.of("us-west-2")) // Specify your region
             .build();
+
+    public Integer querySkierVerticals(String skierId) {
+        QueryRequest queryRequest = QueryRequest.builder()
+                .tableName("skInfo")
+                .keyConditionExpression("primKey = :skierId")
+                .expressionAttributeValues(Map.of(":skierId", AttributeValue.builder().s(skierId).build()))
+                .build();
+
+        QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
+        List<Map<String, AttributeValue>> items = queryResponse.items();
+
+        if (items.isEmpty()) {
+            return null;
+        }
+
+        int vertical = 0;
+        for (Map<String, AttributeValue> item : items) {
+            vertical += Integer.parseInt(item.get("verticals").n());
+        }
+
+        return vertical;
+    }
 
     public void updateSkIdTable(ConcurrentMap<String, List<String>> liftRidesMap) {
         int itemCount = 0;

@@ -15,7 +15,7 @@ sourceSets {
     main {
         java {
             srcDir 'src/main/java' // assuming 'src/main/java' is your main source folder
-            include 'project3/**' // include only the files in the 'project3' folder
+            include 'project4/**' // include only the files in the 'project4' folder
         }
         resources {
             srcDirs 'src/main/resources'
@@ -55,17 +55,17 @@ war {
 }
 
 application {
-    mainClassName = 'project3.server.consumers.Driver'
-}
-
-task runP2Consumer(type: JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    main = 'project2.serverbackendconsumer.Driver'
+    mainClassName = 'project4.server.consumers.Driver'
 }
 
 task runP2Client(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'project2.client.Driver'
+}
+
+task runP2Consumer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'project2.serverbackendconsumer.Driver'
 }
 
 task runP3Client(type: JavaExec) {
@@ -76,6 +76,16 @@ task runP3Client(type: JavaExec) {
 task runP3Consumer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'project3.server.consumers.Driver'
+}
+
+task runP4Client(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'project4.client.Driver'
+}
+
+task runP4Consumer(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'project4.server.consumers.Driver'
 }
 
 bootJar {
