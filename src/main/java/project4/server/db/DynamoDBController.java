@@ -56,7 +56,7 @@ public class DynamoDBController {
 
     public void updateSkIdTable(ConcurrentMap<String, List<String>> liftRidesMap) {
         int itemCount = 0;
-        while (!liftRidesMap.isEmpty() && itemCount < 200000) { // todo: multithreading may introduce write throttling
+        while (itemCount < 200000) { // todo: multithreading may introduce write throttling
             for (Iterator<Map.Entry<String, List<String>>> it = liftRidesMap.entrySet().iterator(); it.hasNext();) {
                 Map.Entry<String, List<String>> entry = it.next();
                 String skierId = entry.getKey();
@@ -97,6 +97,6 @@ public class DynamoDBController {
                 log.info("item count: " + itemCount);
             }
         }
-        log.info("Finished updating skier-table. Total items processed: " + itemCount);
+        log.info("Finished updating skInfo. Total items processed: " + itemCount);
     }
 }
