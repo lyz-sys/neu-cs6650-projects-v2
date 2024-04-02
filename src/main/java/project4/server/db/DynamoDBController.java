@@ -20,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 public class DynamoDBController {
     // Create the session credentials object
     private AwsSessionCredentials awsSessionCredentials = AwsSessionCredentials.create(
-            "ASIAX3JQJHMP4E7OVMF5", // Your access key ID
-            "Ai6nkK1YSZPlJ5XwzXjOrrSO07YWHorblRb6RGYr", // Your secret access key
-            "FwoGZXIvYXdzEIb//////////wEaDBB4Q9Gaj6w+C3+U+SLLAWkhWad0NnoQJX5C1SQI4x35TGtpCLj2Blq8aEwwyPhcGTeTEHtnbUTpw4S1LgiDsqGDivSEk+/mckPNiJ45tx/EQhTlQTnIQbz7FPYa73IZQv9uo6LSsCO4l9pwu3ywPS7DY7mWmpZrD7Q0ZEiEwD6fKa4AY1yduBcDUpxmBA/x2wiszdvIJ/qFbqvBH6pR1GrYbV3U1KJNrxKHfX2DwVbPpdibACoN1rBMzxLxYNCjwsWwFKylXxycT/l08v00uZW68odtP26Efz0nKKK2za8GMi3GU6T0XKKRCT5kgc2RnhHVEQYWjMHCOk3qDI4uvDWH2OgWv+rvbIP0qr6thoM" // Your
+            "ASIAX3JQJHMPZHCHDZ22", // Your access key ID
+            "MaQAZUxACRiSgha6yr7mui/DSwVdfO8dZU8EUeUC", // Your secret access key
+            "FwoGZXIvYXdzEL3//////////wEaDA9YU0tFUNh4oJdTUyLLATunUYGDkg6VnPchl8zl3hTlqIqtFHns8ZujwEYWYcVDSbZGO/ErFTths4dRtjzlbflfUr5GULAz0pTAqMe5hSeX3PWDFMOh6P0mk7O0u9pCrgWkWo93NuS2NcDNw2KzaLf8MXX4TehE3/QBnVFQi/9TcLXebWv9N3Nu372j/Sfw81CjRZPzkpZSI/x7VGhpBz0Bz6K0dLcJDfXPg1tSVcJHew0OO+fb6W5o3Ptgl/seOECqoGAnYo8FPMiRNzW2BdJq1i+NZYTjCdJlKKP3kbAGMi0ea83dfB/b2N57nM9AjDKpKOKALAbyCVxo0LQomZWQW3LS2eX/NP0tuVxUczA=" // Your
                                                                                                                                                                                                                                                                                                                                                                                                                       // session
                                                                                                                                                                                                                                                                                                                                                                                                                       // token
     );
@@ -56,7 +56,7 @@ public class DynamoDBController {
 
     public void updateSkIdTable(ConcurrentMap<String, List<String>> liftRidesMap) {
         int itemCount = 0;
-        while (itemCount < 200000) { // todo: multithreading may introduce write throttling
+        while (itemCount < 200000) { 
             for (Iterator<Map.Entry<String, List<String>>> it = liftRidesMap.entrySet().iterator(); it.hasNext();) {
                 Map.Entry<String, List<String>> entry = it.next();
                 String skierId = entry.getKey();

@@ -47,7 +47,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.rabbitmq:amqp-client:_'
-    implementation 'software.amazon.awssdk:dynamodb:+'
+    implementation 'software.amazon.awssdk:dynamodb:_'
 }
 
 war {
