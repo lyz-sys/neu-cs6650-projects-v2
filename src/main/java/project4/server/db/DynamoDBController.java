@@ -24,9 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 public class DynamoDBController {
     // Create the session credentials object
     private AwsSessionCredentials awsSessionCredentials = AwsSessionCredentials.create(
-            "ASIAX3JQJHMP56CLVG5W", // Your access key ID
-            "7l1IXcSHfSlZmJHbSuMc9qaetaTgqgBSq9aVkj4R", // Your secret access key
-            "IQoJb3JpZ2luX2VjED4aCXVzLXdlc3QtMiJHMEUCIQCvyZgmzpLj0RWBuF29ZIKyjhffIWjHIpb2V58MhjT7pwIgPIaVnWQktO4VKmsR/l7kpKZlhtxqSPzj1V3PR4z2dCoqtAIIZxAAGgw1Mzk2NTY1MzQ4MTUiDG2ZJHUFzERdFjrIfCqRArkDbkxqI8pl7tBsRQFPvFRwueOhBXYvKvUp2oMVKEi4uxNnwd2K2xtiqvAJcalvvyfnlxoaXXLsYyXfVAWDLwZ47a0LHXPhJhOb5V40VtTEZKlNEWEI8nmX7Xd/V1JJA7zGyLPeTdOL7FGHoG7mTeLxbQZa/KTaS7KSJOF6GeSe/A9qvT74TNsizcu7OXg9IYXHa4KvB7s4OoPzFsiPhkwSxP6MZzZ810foELoykHYeBBbQgifLfppjfumA+5BuCQ3g44sSowSWkNRvfSF9HwRKRF+KjLoaivfXEReGD6zHRTQXw6GcKXwNZ3t94igv3JWdHQ/RLvu1zA0SuzDYWe50e8m2QltMFSyD6Fe2f8wkDTC4grKwBjqdAbl5o2rvpt/IJV75OOxCZwHHv8ni9DvdE9i4w3LBEAtf9G+K9zHT46pKUMwkZFtDZSfEuTwMQt/bIeNIqq3i59Sel9KDYh3rGrxHXnvIyyd8CBMgFfee5j6udSzBobxF0YsiLvFVgnSKtI7kEgDJ2EeRmAFb8Zzxfyn5N7ER77jJJiE4Oha4Vtoaqie/6C6OVNXN5pSAsGg/+Apy4aI=" // Your session token
+            "", // Your access key ID
+            "", // Your secret access key
+            "" // Your session token
     );
 
     private DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
