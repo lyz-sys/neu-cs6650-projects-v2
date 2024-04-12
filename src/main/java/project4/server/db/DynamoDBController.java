@@ -20,96 +20,24 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.Iterator;
 import lombok.extern.slf4j.Slf4j;
 import project4.server.servlets.SkierServlet.VerticalBody;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 @Slf4j
 public class DynamoDBController {
+    private static final Logger logger = Logger.getLogger(DynamoDBController.class.getName());
+
     // Create the session credentials object
     private AwsSessionCredentials awsSessionCredentials = AwsSessionCredentials.create(
-            "ASIAX3JQJHMPUF6IRJ5Z", // Your access key ID
-            "upalMchiRmYU6qJdNUILa10q75DfXRUSWdFNgKbH", // Your secret access key
-            "IQoJb3JpZ2luX2VjEBMaCXVzLXdlc3QtMiJHMEUCIBdVgyqFnUJ0BIGmb3xlGAYK72zbBNPEzBKjKpak/AEMAiEAyfC271FIFo7QC2xw1tCc1a6AwrhnVdyEazV/+SsCkL4qtAIITBAAGgw1Mzk2NTY1MzQ4MTUiDPanTS8lXhbGbE3k3SqRAhHxlJIN6py/UId3qd5mjZsOj02oLUbDv0gWJZKYxFgWjI/qjd80ccXeNZV/gJdq8P5bJJyD3okVG0HOLxbC8yriso3EkX9ZWpMgZi9zpN4YIhi6U4PMuCGyzFaTrqxl15XEOi+k41DgpdzziEt2ensUoD5l0LNZ5eYLXQy/g6ALzMwTi5cIq9ekBOlMd9pchtsH5C5NUnWW3bFeJZgoOxzoq01ARm9Pwjtf8sBLzJK2k9SN1VuTB3JFlWs7hWagq4lOZT0eEnOTEmYTrUl/f+9bDebSuj7bTsLJZGX7zmlooVrCEvkl9nwLdygfXW9abwOVvfgiyj0jjtpJ2d5+ojw7Tm48X1ZDqcTJtyLOCXKgDTDO5eCwBjqdAQArtl4jFx/cykjn0HLfneiLG9LGZ+rmlqMl/E1cQ2HhuY8KkDeZXAu5uRJsPRykUyUb+i8UKaMxb9QCsItxXe6k6J5LG8vezHRAflLYVxbZDp7RSFjAyVdyOpn3yRhOlmfaWtcKOypdYp7As0uoZW+ny8cn4+RpBb0CaVVQDf6dq9AeusbWDR/dgLrHV5Nl/6KB+8C2fM8h8xGs6jQ=" // Your session token
+            "ASIAX3JQJHMP3W3EPJSY", // Your access key ID
+            "+7ryjvrr8TmFnlJxt+zfILySDSTbdxFIeKnFfXlF", // Your secret access key
+            "IQoJb3JpZ2luX2VjECsaCXVzLXdlc3QtMiJHMEUCIFtCV5Byi2dQTXmGgyt1w5SRQ/vXQZ1Tlt+sEJfvuHqxAiEA2Xx+ek3m5mcXArUlgEVugSdc+tVQ1PpVGOyMPrZRC4MqtAIIZBAAGgw1Mzk2NTY1MzQ4MTUiDAz8LfCP1cAkpMt8hSqRAoo/bBMGFJWrizN+T8yApLQ+hzweSa5VrYB+w4uCl6ujEVeR2lWKnvtuGbQA8G7TVnxIXuVzBjqDcZ0uMTXr4SQ4+FRPe2bPVzqauS/rHFakNRaZ7mFA7q8hS/wJhr3x/mqE+KZTD8czlHBSlBX4IozM/GlaT2/8oVhl7Vi38AfAeySdPa9dHt3A+nOvmW+8A0tFO+NvEEgsOWQI1yOiWLlN+45z4dAg64pHo8WKYvQpCc+L7qFIfgBOJYqsua1JZUA7cz+Q9GKw2l4Wvqq44rZyB9SNdTIZZaWO1RSfdnD1el0BTjlnKjW+HQXERqxeRJqjTjQVso6nuwE9w2Xbzul9XjX1J9PIkezygrsYw3H8XDC//uWwBjqdATi3YSXnxL0F2NPpnX055kwBGwMJHsD8mmcG4JJ/OacmZhmq9uYFZeF2FIr721tNPknp4hUbjtBeTDT2Y2i8ctzQqA0NOskrY3U70IA1uVo1HE9huPpKlgDWdhJLuQXb9YCgriCX2UlU3Xzu8EEcFGrEuQC3BDv5Q6zAf/JxsE69WZg1fFjEBsL7oJ9Q9DbohaZoQAdzFDnUVkb9E6Y=" // Your session token
     );
 
     private DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
             .credentialsProvider(StaticCredentialsProvider.create(awsSessionCredentials))
             .region(Region.of("us-west-2")) // Specify your region
             .build();
-
-    public Integer querySkierVerticals(String skierId, VerticalBody verticalBody) {
-        // Build the key condition expression and attribute values
-        String keyConditionExpression = "primKey = :skierId";
-        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":skierId", AttributeValue.builder().s(skierId).build());
-
-        // Prepare the filter expression based on resort and season if provided
-        String filterExpression = "";
-        expressionAttributeValues.put(":resort", AttributeValue.builder().s(verticalBody.getResort()).build());
-        filterExpression = "resort = :resort";
-
-        if (verticalBody.getSeason() != null && !verticalBody.getSeason().isEmpty()) {
-            expressionAttributeValues.put(":season", AttributeValue.builder().s(verticalBody.getSeason()).build());
-            filterExpression += " AND ";
-            filterExpression += "season = :season";
-        }
-
-        // Build the query request
-        QueryRequest.Builder queryBuilder = QueryRequest.builder()
-                .tableName("skInfo")
-                .keyConditionExpression(keyConditionExpression)
-                .expressionAttributeValues(expressionAttributeValues);
-
-        // Add filter expression if needed
-        if (!filterExpression.isEmpty()) {
-            queryBuilder.filterExpression(filterExpression);
-        }
-
-        QueryRequest queryRequest = queryBuilder.build();
-        QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
-        List<Map<String, AttributeValue>> items = queryResponse.items();
-
-        if (items.isEmpty()) {
-            return null;
-        }
-
-        // Calculate total verticals
-        int vertical = 0;
-        for (Map<String, AttributeValue> item : items) {
-            vertical += Integer.parseInt(item.get("verticals").s());
-        }
-
-        return vertical;
-    }
-
-    public Integer queryASkierVertical(String skierID, String resortID, String seasonID, String dayID) {
-        // Assuming 'primKey' is a combination of skierID, resortID, seasonID, and dayID
-        // This example will need adjustment if your table uses different key structures
-        String keyConditionExpression = "skierId = :skierId AND resortId = :resortId AND seasonId = :seasonId AND dayId = :dayId";
-        
-        Map<String, AttributeValue> expressionAttributeValues = new HashMap<>();
-        expressionAttributeValues.put(":skierId", AttributeValue.builder().s(skierID).build());
-        expressionAttributeValues.put(":resortId", AttributeValue.builder().s(resortID).build());
-        expressionAttributeValues.put(":seasonId", AttributeValue.builder().s(seasonID).build());
-        expressionAttributeValues.put(":dayId", AttributeValue.builder().s(dayID).build());
-    
-        QueryRequest queryRequest = QueryRequest.builder()
-                .tableName("skInfo")
-                .keyConditionExpression(keyConditionExpression)
-                .expressionAttributeValues(expressionAttributeValues)
-                .build();
-    
-        QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
-        List<Map<String, AttributeValue>> items = queryResponse.items();
-    
-        if (items.isEmpty()) {
-            return null;
-        }
-    
-        // Assuming there is only one item because the query is for a specific record
-        Map<String, AttributeValue> item = items.get(0);
-        int vertical = Integer.parseInt(item.get("verticals").n()); // Using .n() assuming 'verticals' is stored as Number in DynamoDB
-    
-        return vertical;
-    }    
 
     public void updateSkIdTable(ConcurrentMap<String, List<String>> liftRidesMap) {
         int itemCount = 0;
@@ -168,5 +96,86 @@ public class DynamoDBController {
                 .build();
 
         dynamoDbClient.batchWriteItem(batchWriteItemRequest);
+    }
+
+    public Integer getTotalVerticalForSkier(String skierId, String resortId, List<String> seasonIds) {
+        int totalVertical = 0;
+
+        for (String seasonId : seasonIds) {
+            String gsiPartitionKey = skierId;
+            String gsiSortKeyPrefix = resortId + "_" + seasonId;
+
+            // Log the variables before the query
+            logger.log(Level.INFO, "Querying GSI with skierId: {0}, resortId: {1}, seasonId: {2}",
+                    new Object[] { skierId, resortId, seasonId });
+
+            QueryRequest queryRequest = QueryRequest.builder()
+                    .tableName("SkiActivities")
+                    .indexName("skierId-resortId_seasonId-index")
+                    .keyConditionExpression(
+                            "skierId = :gsiPartitionKey AND begins_with(resortId_seasonId_dayId, :gsiSortKeyPrefix)")
+                    .expressionAttributeValues(Map.of(
+                            ":gsiPartitionKey", AttributeValue.builder().s(gsiPartitionKey).build(),
+                            ":gsiSortKeyPrefix", AttributeValue.builder().s(gsiSortKeyPrefix).build()))
+                    .build();
+
+            QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
+
+            if (queryResponse.hasItems()) {
+                int seasonVertical = queryResponse.items().stream()
+                        .mapToInt(item -> Integer.parseInt(item.get("verticals").n()))
+                        .sum();
+                // Log the result for each season
+                logger.log(Level.INFO, "Total vertical for season {0}: {1}", new Object[] { seasonId, seasonVertical });
+                totalVertical += seasonVertical;
+            } else {
+                // Log when no items are found
+                logger.log(Level.WARNING, "No items found for skierId: {0}, resortId: {1}, seasonId: {2}",
+                        new Object[] { skierId, resortId, seasonId });
+            }
+        }
+
+        // Log the final total vertical
+        logger.log(Level.INFO, "Total vertical for skier {0}: {1}", new Object[] { skierId, totalVertical });
+        return totalVertical;
+    }
+
+    public Integer getSkiDayVerticalForSkier(String resortId, String seasonId, String dayId, String skierId) {
+        String partitionKey = resortId + "_" + seasonId + "_" + dayId;
+
+        // Querying the primary key
+        QueryRequest queryRequest = QueryRequest.builder()
+                .tableName("SkiActivities")
+                .keyConditionExpression("resortId_seasonId_dayId = :partitionKey AND skierId = :skierId")
+                .expressionAttributeValues(Map.of(
+                        ":partitionKey", AttributeValue.builder().s(partitionKey).build(),
+                        ":skierId", AttributeValue.builder().s(skierId).build()))
+                .build();
+
+        QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
+        return queryResponse.items().stream()
+                .findFirst()
+                .map(item -> Integer.parseInt(item.get("verticals").n()))
+                .orElse(0); // Returns 0 if there is no record found
+    }
+
+    public Integer getUniqueSkierCount(String resortId, String seasonId, String dayId) {
+        String partitionKey = resortId + "_" + seasonId + "_" + dayId;
+        String uniqueSkiersKey = "UNIQUE_COUNT"; // This is a constant placeholder for unique skier count items
+
+        // Querying the primary key
+        QueryRequest queryRequest = QueryRequest.builder()
+                .tableName("SkiActivities")
+                .keyConditionExpression("resortId_seasonId_dayId = :partitionKey AND skierId = :uniqueSkiersKey")
+                .expressionAttributeValues(Map.of(
+                        ":partitionKey", AttributeValue.builder().s(partitionKey).build(),
+                        ":uniqueSkiersKey", AttributeValue.builder().s(uniqueSkiersKey).build()))
+                .build();
+
+        QueryResponse queryResponse = dynamoDbClient.query(queryRequest);
+        return queryResponse.items().stream()
+                .findFirst()
+                .map(item -> Integer.parseInt(item.get("uniqueSkiers").n()))
+                .orElse(0); // Returns 0 if there is no record found
     }
 }

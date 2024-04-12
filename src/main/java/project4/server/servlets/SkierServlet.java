@@ -16,6 +16,7 @@ import project4.server.db.DynamoDBController;
 import project4.server.RabbitMQUtil;
 
 import project4.*;
+import java.util.List;
 
 @Slf4j
 @WebServlet(name = "SkierServlet", urlPatterns = "/skiers/*")
@@ -79,13 +80,13 @@ public class SkierServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String pathInfo = request.getPathInfo(); // /{skierID}/vertical
+        String pathInfo = request.getPathInfo();
         if (pathInfo != null) {
             String[] pathParts = pathInfo.split("/");
             if (pathParts.length == 3 && "vertical".equals(pathParts[2])) {
-                processGetVerticals(pathParts[1], response, parseVerticalBody(request));
+                processGetVerticals(pathParts[1], parseVerticalBody(request), response);
             } else {
-                processGetAVertical(pathParts[2], pathParts[4], pathParts[6], pathParts[8], response);
+                processGetAVertical(pathParts[1], pathParts[3], pathParts[5], pathParts[7], response);
             }
         } else {
             // Handle request without additional path info
@@ -95,23 +96,23 @@ public class SkierServlet extends HttpServlet {
 
     private void processGetAVertical(String resortID, String seasonID, String dayID, String skierID,
             HttpServletResponse response) throws IOException {
-        Integer aVertical = dynamoDBController.queryASkierVertical(skierID, resortID, seasonID, dayID);
+        Integer aVertical = dynamoDBController.getSkiDayVerticalForSkier(resortID, seasonID, dayID, skierID);
 
-        if (aVertical == null) {
+        if (aVertical == 0) {
             // No item found
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             // Set response content type and write response body
             response.setContentType("application/json");
-            response.getWriter().write(String.format("{\"skierID\": %s, \"aVertical\": %s}", skierID, aVertical));
+            response.getWriter().write(String.format("{\"skierID\": %s, \"the skier's vertical\": %s}", skierID, aVertical));
         }
     }
 
-    private void processGetVerticals(String skierID, HttpServletResponse response, VerticalBody verticalBody)
+    private void processGetVerticals(String skierID, VerticalBody verticalBody, HttpServletResponse response)
             throws IOException {
-        Integer verticals = dynamoDBController.querySkierVerticals(skierID, verticalBody);
+        Integer verticals = dynamoDBController.getTotalVerticalForSkier(skierID, verticalBody.getResort(), verticalBody.getSeasons());
 
-        if (verticals == null) {
+        if (verticals == 0) {
             // No item found
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
@@ -188,14 +189,14 @@ public class SkierServlet extends HttpServlet {
 
     public static class VerticalBody {
         private String resort;
-        private String season;
+        private List<String> seasons;
 
         public String getResort() {
             return resort;
         }
 
-        public String getSeason() {
-            return season;
+        public List<String> getSeasons() {
+            return seasons;
         }
     }
 }
