@@ -21,40 +21,11 @@ import project4.*;
 @WebServlet(name = "SkierServlet", urlPatterns = "/skiers/*")
 public class SkierServlet extends HttpServlet {
     private DynamoDBController dynamoDBController = new DynamoDBController();
+    private final Gson gson = new Gson();
 
     @Override
     public void init() throws ServletException {
         RabbitMQUtil.initRMQ();
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        String pathInfo = request.getPathInfo(); // /{skierID}/vertical
-        if (pathInfo != null) {
-            String[] pathParts = pathInfo.split("/");
-            if (pathParts.length == 3 && "vertical".equals(pathParts[2])) {
-                processGetVerticals(pathParts[1], response);
-            } else {
-                // todo: handle request with other path info
-            }
-        } else {
-            // Handle request without additional path info
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
-    private void processGetVerticals(String skierID, HttpServletResponse response) throws IOException {
-        Integer verticals = dynamoDBController.querySkierVerticals(skierID);
-
-        if (verticals == null) {
-            // No item found
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-        } else {
-            // Set response content type and write response body
-            response.setContentType("application/json");
-            response.getWriter().write(String.format("{\"skierID\": %s, \"totalVert\": %s}", skierID, verticals));
-        }
     }
 
     @Override
@@ -89,7 +60,7 @@ public class SkierServlet extends HttpServlet {
     }
 
     // Check if the URL pattern is correct
-    private LiftRide isRequestValid(HttpServletRequest req) {
+    private LiftRide isRequestValid(HttpServletRequest req) throws IOException {
         LiftRide ride = parseRequestBody(req);
         if (ride == null) {
             ride.isValid = false;
@@ -101,31 +72,57 @@ public class SkierServlet extends HttpServlet {
         return ride;
     }
 
-    private LiftRide parseRequestBody(HttpServletRequest req) {
-        LiftRide ride = null;
-        try {
-            String requestBody = getRequestBody(req);
-            if (!requestBody.isEmpty()) {
-                Gson gson = new Gson();
-                ride = gson.fromJson(requestBody, LiftRide.class);
-            }
-        } catch (JsonSyntaxException e) {
-            log.error("Invalid request body", e);
-        }
-        return ride;
+    private LiftRide parseRequestBody(HttpServletRequest req) throws IOException {
+        return gson.fromJson(req.getReader(), LiftRide.class);
     }
 
-    private String getRequestBody(HttpServletRequest req) {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try (BufferedReader reader = req.getReader()) {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String pathInfo = request.getPathInfo(); // /{skierID}/vertical
+        if (pathInfo != null) {
+            String[] pathParts = pathInfo.split("/");
+            if (pathParts.length == 3 && "vertical".equals(pathParts[2])) {
+                processGetVerticals(pathParts[1], response, parseVerticalBody(request));
+            } else {
+                processGetAVertical(pathParts[2], pathParts[4], pathParts[6], pathParts[8], response);
             }
-        } catch (IOException e) {
-            log.error("Failed to read request body", e);
+        } else {
+            // Handle request without additional path info
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
-        return sb.toString();
+    }
+
+    private void processGetAVertical(String resortID, String seasonID, String dayID, String skierID,
+            HttpServletResponse response) throws IOException {
+        Integer aVertical = dynamoDBController.queryASkierVertical(skierID, resortID, seasonID, dayID);
+
+        if (aVertical == null) {
+            // No item found
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            // Set response content type and write response body
+            response.setContentType("application/json");
+            response.getWriter().write(String.format("{\"skierID\": %s, \"aVertical\": %s}", skierID, aVertical));
+        }
+    }
+
+    private void processGetVerticals(String skierID, HttpServletResponse response, VerticalBody verticalBody)
+            throws IOException {
+        Integer verticals = dynamoDBController.querySkierVerticals(skierID, verticalBody);
+
+        if (verticals == null) {
+            // No item found
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        } else {
+            // Set response content type and write response body
+            response.setContentType("application/json");
+            response.getWriter().write(String.format("{\"skierID\": %s, \"totalVert\": %s}", skierID, verticals));
+        }
+    }
+
+    private VerticalBody parseVerticalBody(HttpServletRequest req) throws IOException {
+        return gson.fromJson(req.getReader(), VerticalBody.class);
     }
 
     private boolean isLiftIDValid(int liftID) {
@@ -171,7 +168,7 @@ public class SkierServlet extends HttpServlet {
         RabbitMQUtil.destroyRMQ();
     }
 
-    static class LiftRide {
+    public static class LiftRide {
         private int time;
         private int liftID;
         private boolean isValid;
@@ -186,6 +183,19 @@ public class SkierServlet extends HttpServlet {
 
         public boolean isValid() {
             return isValid;
+        }
+    }
+
+    public static class VerticalBody {
+        private String resort;
+        private String season;
+
+        public String getResort() {
+            return resort;
+        }
+
+        public String getSeason() {
+            return season;
         }
     }
 }
