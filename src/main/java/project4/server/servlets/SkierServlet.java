@@ -48,7 +48,7 @@ public class SkierServlet extends HttpServlet {
                 RabbitMQUtil.sendMessage(message);
             } catch (Exception e) {
                 e.printStackTrace();
-            } // todo: maybe do it asynchronously
+            }
 
             // Set response content type and write response body if needed
             resp.setContentType("application/json");
