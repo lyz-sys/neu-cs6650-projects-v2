@@ -13,12 +13,17 @@ import project4.server.RabbitMQUtil;
 import project4.Configuration;
 import project4.server.db.DynamoDBController;
 import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.AbstractMap;
 
 @Slf4j
 public class Driver {
     private static final Configuration CONFIG = new Configuration();
     private static final ConcurrentMap<String, List<String>> liftRidesMap = new ConcurrentHashMap<>();
     private static final DynamoDBController dynamoDBController = new DynamoDBController();
+    private static final BlockingQueue<Map.Entry<String, List<String>>> queue = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) {
         try {
@@ -41,7 +46,7 @@ public class Driver {
             }).start();
         }
 
-        dynamoDBController.updateSkIdTable(liftRidesMap); // todo: may need to join
+        dynamoDBController.updateSkIdTable(queue);
     }
 
     private static void processMessage(String message) {
@@ -56,6 +61,7 @@ public class Driver {
         
         String skierId = parts[3];
         
-        liftRidesMap.putIfAbsent(skierId, liftRides);
+        // liftRidesMap.putIfAbsent(skierId, liftRides);
+        queue.offer(new AbstractMap.SimpleEntry<>(skierId, liftRides));
     }
 }
