@@ -48,6 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.rabbitmq:amqp-client:_'
     implementation 'software.amazon.awssdk:dynamodb:_'
+    implementation 'redis.clients:jedis:4.2.3'
 }
 
 war {

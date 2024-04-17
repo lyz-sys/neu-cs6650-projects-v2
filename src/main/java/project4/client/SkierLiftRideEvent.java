@@ -14,7 +14,7 @@ public class SkierLiftRideEvent {
 
     public SkierLiftRideEvent() {
         this.skierID = ThreadLocalRandom.current().nextInt(1, 100001);
-        this.resortID = ThreadLocalRandom.current().nextInt(1, 11);
+        this.resortID = ThreadLocalRandom.current().nextInt(1, 2);
         this.liftID = ThreadLocalRandom.current().nextInt(1, 41);
         this.time = ThreadLocalRandom.current().nextInt(1, 361);
         this.body = new LiftRide();

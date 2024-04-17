@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import project4.server.RabbitMQUtil;
 import project4.Configuration;
 import project4.server.db.DynamoDBController;
+import project4.server.db.RedisController;
+
 import java.util.concurrent.ConcurrentMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -21,8 +23,7 @@ import java.util.AbstractMap;
 @Slf4j
 public class Driver {
     private static final Configuration CONFIG = new Configuration();
-    private static final ConcurrentMap<String, List<String>> liftRidesMap = new ConcurrentHashMap<>();
-    private static final DynamoDBController dynamoDBController = new DynamoDBController();
+    public static final RedisController redisController = new RedisController();
     private static final BlockingQueue<Map.Entry<String, List<String>>> queue = new LinkedBlockingQueue<>();
 
     public static void main(String[] args) {
@@ -46,7 +47,7 @@ public class Driver {
             }).start();
         }
 
-        dynamoDBController.updateSkIdTable(queue);
+        redisController.doSkierPost(queue);
     }
 
     private static void processMessage(String message) {
@@ -61,7 +62,6 @@ public class Driver {
         
         String skierId = parts[3];
         
-        // liftRidesMap.putIfAbsent(skierId, liftRides);
         queue.offer(new AbstractMap.SimpleEntry<>(skierId, liftRides));
     }
 }

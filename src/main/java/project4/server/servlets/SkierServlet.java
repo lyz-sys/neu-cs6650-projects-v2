@@ -13,6 +13,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import lombok.extern.slf4j.Slf4j;
 import project4.server.db.DynamoDBController;
+import project4.server.db.RedisController;
 import project4.server.RabbitMQUtil;
 
 import project4.*;
@@ -21,7 +22,8 @@ import java.util.List;
 @Slf4j
 @WebServlet(name = "SkierServlet", urlPatterns = "/skiers/*")
 public class SkierServlet extends HttpServlet {
-    private DynamoDBController dynamoDBController = new DynamoDBController();
+    // private DynamoDBController dynamoDBController = new DynamoDBController();
+    private RedisController redisController = new RedisController();
     private final Gson gson = new Gson();
 
     @Override
@@ -96,8 +98,9 @@ public class SkierServlet extends HttpServlet {
 
     private void processGetAVertical(String resortID, String seasonID, String dayID, String skierID,
             HttpServletResponse response) throws IOException {
-        Integer aVertical = dynamoDBController.getSkiDayVerticalForSkier(resortID, seasonID, dayID, skierID);
-
+        // Integer aVertical = dynamoDBController.getSkiDayVerticalForSkier(resortID, seasonID, dayID, skierID);
+        Integer aVertical = redisController.getSkiDayVerticalForSkier(resortID, seasonID, dayID, skierID);
+        
         if (aVertical == 0) {
             // No item found
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -110,7 +113,8 @@ public class SkierServlet extends HttpServlet {
 
     private void processGetVerticals(String skierID, VerticalBody verticalBody, HttpServletResponse response)
             throws IOException {
-        Integer verticals = dynamoDBController.getTotalVerticalForSkier(skierID, verticalBody.getResort(), verticalBody.getSeasons());
+        // Integer verticals = dynamoDBController.getTotalVerticalForSkier(skierID, verticalBody.getResort(), verticalBody.getSeasons());
+        Integer verticals = redisController.getTotalVerticalForSkier(skierID, verticalBody.getResort(), verticalBody.getSeasons());
 
         if (verticals == 0) {
             // No item found

@@ -5,10 +5,12 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import project4.server.db.DynamoDBController;
+import project4.server.db.RedisController;
 
 @WebServlet(name = "ResortServlet", urlPatterns = "/resorts/*")
 public class ResortServlet extends HttpServlet {
     private DynamoDBController dynamoDBController = new DynamoDBController();
+    private RedisController redisController = new RedisController();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -25,7 +27,8 @@ public class ResortServlet extends HttpServlet {
 
     private void processGetUniqueSkier(String resortID, String seasonID, String dayID,
             HttpServletResponse response) throws IOException {
-        Integer uniqueSkier = dynamoDBController.getUniqueSkierCount(resortID, seasonID, dayID);
+        // Integer uniqueSkier = dynamoDBController.getUniqueSkierCount(resortID, seasonID, dayID);
+        Integer uniqueSkier = redisController.getUniqueSkierCount(resortID, seasonID, dayID);
 
         if (uniqueSkier == 0) {
             // No item found
